@@ -100,21 +100,27 @@ class WordForm(object):
     def minNumSyllables(self):
         return min([len(p.syllables()) for p in self.pronunciations])
 
-def buildWordFormDict(celexPath):
-    print "Building English wordform dictionary from", os.sep.join([celexPath,
-        'english'])
-    print "Reading lemmas...",
-    sys.stdout.flush()
+def buildWordFormDict(celexPath, verbose=False):
+    if verbose:
+        print >> sys.stderr, "Building English wordform dictionary from", os.sep.join([celexPath,
+            'english'])
+        print >> sys.stderr, "Reading lemmas...",
+        sys.stdout.flush()
+
     lemmas = loadLemmas(celexPath)
-    print "(%d lemmas)" % len(lemmas)
 
-    print "Reading morphology...",
-    sys.stdout.flush()
+    if verbose:
+        print >> sys.stderr, "(%d lemmas)" % len(lemmas)
+        print >> sys.stderr, "Reading morphology...",
+        sys.stdout.flush()
+
     emw = loadEMW(celexPath)
-    print "(%d wordforms)" % len(emw)
 
-    print "Reading phonology...",
-    sys.stdout.flush()
+    if verbose:
+        print >> sys.stderr, "(%d wordforms)" % len(emw)
+        print >> sys.stderr, "Reading phonology...",
+        sys.stdout.flush()
+
     f = open(os.sep.join([celexPath, 'english', 'epw', 'epw.cd']), 'r')
     r = csv.reader(f, delimiter='\\', quoting=csv.QUOTE_NONE)
 
@@ -155,10 +161,11 @@ def buildWordFormDict(celexPath):
                 d[ortho.lower()].append(wf)
                             
     except csv.Error, e:
-        print 'CSV error in %s at line %d' % (fileName,lineno)
+        print >> sys.stderr, 'CSV error in %s at line %d' % (fileName,lineno)
         raise e
 
-    print "(%d orthographies)" % len(d)
+    if verbose:
+        print >> sys.stderr, "(%d orthographies)" % len(d)
     return d
 
 def boolYN(s):
